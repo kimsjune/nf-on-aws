@@ -15,7 +15,7 @@ aws s3 ls s3://jk-rnaseq/work --recursive > all_dir.txt
 # remove the first line which is the parent directory work/ (obviously don't want to delete)
 tail -n +2 all_dir.txt > all_dir.txt
 
-# extract the relative paths (last column), keep paths up to the 3rd /, append bucket name, and save unique lines
+# extract the relative paths (last column), keep paths up to the 3rd /, append bucket name, and collapse duplicate paths
 cat all_dir.txt | awk '{print $NF}' | sed 's/\/[^/]*//3g' | sed 's/^/s3:\/\/jk-rnaseq\//' | uniq  > all_dir_uniq.txt
 
 # directories that I want to delete are unique to all_dir_uniq.txt
@@ -28,6 +28,8 @@ cat to_delete.txt | xargs -r -P 1 -n 1 aws s3 rm--recursive
 
 `uniq` merges matching lines to the first occurrence.  
 `uniq -u` only prints unique, unduplicated lines.
+`sed 's/\/[^/]*//3g'` equivalent to `cut -f1,2,3 -d'/'`
+
 
 ### Aftermath
 
